@@ -41,7 +41,11 @@ module SecureHeaders
       @raw_cookie.dup.tap do |c|
         c << "; secure" if secure?
         c << "; HttpOnly" if httponly?
-        c << "; #{samesite_cookie}" if samesite?
+        if samesite?
+          c.sub!(/;\s*samesite=[A-Za-z]+/i, '')
+          c << "; #{samesite_cookie}"
+        end
+        # c << "; #{samesite_cookie}" if samesite?
       end
     end
 
@@ -54,7 +58,8 @@ module SecureHeaders
     end
 
     def samesite?
-      flag_samesite? && !already_flagged?(:samesite)
+      # flag_samesite? && !already_flagged?(:samesite)
+      flag_samesite?
     end
 
     private
